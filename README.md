@@ -1,2 +1,5 @@
 # YourSabahTrips
 TARUMT DSF2S2 AMCS2084 MINI PROJECT
+=======
+  Run `npm run dev` to start the development server.
+
