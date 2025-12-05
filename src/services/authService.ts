@@ -5,10 +5,10 @@
 
 // XAMPP: http://localhost/YourSabahTrips/api
 // Direct PHP server: http://localhost:8000/api
-const API_BASE_URL = 'http://localhost/YourSabahTrips/api';
+export const API_BASE_URL = 'http://localhost/YourSabahTrips/api';
 
 // Helper function to make fetch requests with proper CORS handling
-async function fetchAPI(endpoint: string, options: RequestInit = {}) {
+export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   
   const defaultOptions: RequestInit = {
