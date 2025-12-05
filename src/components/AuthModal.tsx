@@ -43,6 +43,10 @@ export function AuthModal({ onClose, onLogin, darkMode }: AuthModalProps) {
         } else {
           response = await registerAdmin(
             formData.username,
+<<<<<<< HEAD
+=======
+            formData.email,
+>>>>>>> origin/test1
             formData.password
           );
         }

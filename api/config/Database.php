@@ -91,3 +91,7 @@ class Database
         return $this->conn->lastInsertId();
     }
 }
+<<<<<<< HEAD
+=======
+?>
+>>>>>>> origin/test1

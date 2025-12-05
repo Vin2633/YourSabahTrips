@@ -1,7 +1,10 @@
 import { BarChart3, TrendingUp, Users, Package, Edit2, Trash2, Plus, DollarSign, MapPin, Eye, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+<<<<<<< HEAD
 import { registerAdmin } from '../services/authService';
+=======
+>>>>>>> origin/test1
 
 interface AdminDashboardProps {
   user: any;
@@ -69,8 +72,12 @@ export function AdminDashboard({ user, darkMode }: AdminDashboardProps) {
   const totalSales = salesData.reduce((sum, item) => sum + item.sales, 0);
   const totalBookings = salesData.reduce((sum, item) => sum + item.bookings, 0);
   const avgSatisfaction = 4.4;
+<<<<<<< HEAD
   const isSuperAdmin = user.roleLevel === 'SuperAdmin';
   console.log('User object:', user, 'RoleLevel:', user.RoleLevel, 'isSuperAdmin:', isSuperAdmin);
+=======
+  const isSuperAdmin = user.username === 'SuperAdmin';
+>>>>>>> origin/test1
 
   const handleDeletePackage = (id: number) => {
     if (confirm('Are you sure you want to delete this package?')) {
@@ -88,6 +95,7 @@ export function AdminDashboard({ user, darkMode }: AdminDashboardProps) {
     setShowPackageModal(true);
   };
 
+<<<<<<< HEAD
   const handleRegisterAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -102,10 +110,15 @@ export function AdminDashboard({ user, darkMode }: AdminDashboardProps) {
       return;
     }
     
+=======
+  const handleRegisterAdmin = (e: React.FormEvent) => {
+    e.preventDefault();
+>>>>>>> origin/test1
     if (newAdminData.password !== newAdminData.confirmPassword) {
       alert('Passwords do not match!');
       return;
     }
+<<<<<<< HEAD
 
     try {
       const result = await registerAdmin(
@@ -125,6 +138,11 @@ export function AdminDashboard({ user, darkMode }: AdminDashboardProps) {
     } catch (error) {
       alert(`Error registering admin: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+=======
+    alert(`Admin "${newAdminData.username}" registered successfully!`);
+    setShowAdminModal(false);
+    setNewAdminData({ username: '', password: '', confirmPassword: '' });
+>>>>>>> origin/test1
   };
 
   return (

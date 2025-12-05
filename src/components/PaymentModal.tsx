@@ -23,7 +23,11 @@ export function PaymentModal({ packageData, onClose, onSuccess, darkMode = false
     paymentMethod: 'credit_card'
   });
 
+<<<<<<< HEAD
   const totalAmount = packageData.price * bookingData.numPax;
+=======
+  const totalAmount = (packageData.Price || packageData.price) * bookingData.numPax;
+>>>>>>> origin/test1
   const serviceFee = totalAmount * 0.05; // 5% service fee
   const grandTotal = totalAmount + serviceFee;
 

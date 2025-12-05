@@ -32,7 +32,7 @@ class Auth
 
     /**
      * Validate password strength
-     * Minimum 6 characters
+     * Minimum 8 characters
      */
     public static function isValidPassword($password)
     {
@@ -117,4 +117,3 @@ class Auth
         exit;
     }
 }
-?>

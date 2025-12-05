@@ -29,6 +29,7 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 // Validate required fields
 $username = $input['username'] ?? '';
+<<<<<<< HEAD
 $password = $input['password'] ?? '';
 $roleLevel = $input['roleLevel'] ?? 'Standard';
 $requestingAdminRoleLevel = $input['currentAdminRoleLevel'] ?? null;
@@ -56,6 +57,29 @@ if (!Auth::isValidPassword($password)) {
 $validRoles = ['Standard', 'SuperAdmin'];
 if (!in_array($roleLevel, $validRoles)) {
     Auth::sendResponse(false, 'Invalid role level. Must be Standard or SuperAdmin.');
+=======
+$email = $input['email'] ?? '';
+$password = $input['password'] ?? '';
+$roleLevel = $input['roleLevel'] ?? 'standard';
+
+// Validation
+if (empty($username) || empty($email) || empty($password)) {
+    Auth::sendResponse(false, 'Username, email, and password are required.');
+}
+
+if (!Auth::isValidEmail($email)) {
+    Auth::sendResponse(false, 'Invalid email format.');
+}
+
+if (!Auth::isValidPassword($password)) {
+    Auth::sendResponse(false, 'Password must be at least 6 characters long.');
+}
+
+// Validate role level
+$validRoles = ['standard', 'manager', 'superadmin'];
+if (!in_array(strtolower($roleLevel), $validRoles)) {
+    $roleLevel = 'standard';
+>>>>>>> origin/test1
 }
 
 try {
@@ -72,13 +96,31 @@ try {
         Auth::sendResponse(false, 'Username already taken. Please choose a different username.');
     }
 
+<<<<<<< HEAD
+=======
+    // Check if email already exists
+    $checkEmail = $db->queryOne(
+        "SELECT Email FROM ADMIN WHERE Email = ?",
+        [$email]
+    );
+
+    if ($checkEmail) {
+        Auth::sendResponse(false, 'Email already registered as admin.');
+    }
+
+>>>>>>> origin/test1
     // Hash password
     $passwordHash = Auth::hashPassword($password);
 
     // Insert new admin
     $db->execute(
+<<<<<<< HEAD
         "INSERT INTO ADMIN (Username, PasswordHash, RoleLevel) VALUES (?, ?, ?)",
         [$username, $passwordHash, $roleLevel]
+=======
+        "INSERT INTO ADMIN (Username, Email, PasswordHash, RoleLevel) VALUES (?, ?, ?, ?)",
+        [$username, $email, $passwordHash, $roleLevel]
+>>>>>>> origin/test1
     );
 
     $adminId = $db->lastInsertId();
@@ -87,6 +129,10 @@ try {
     $userData = [
         'adminId' => $adminId,
         'username' => $username,
+<<<<<<< HEAD
+=======
+        'email' => $email,
+>>>>>>> origin/test1
         'roleLevel' => $roleLevel,
         'role' => 'admin'
     ];
@@ -98,3 +144,7 @@ try {
 } catch (Exception $e) {
     Auth::sendResponse(false, 'Registration failed: ' . $e->getMessage());
 }
+<<<<<<< HEAD
+=======
+?>
+>>>>>>> origin/test1

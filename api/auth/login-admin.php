@@ -1,5 +1,4 @@
 <?php
-error_log("Login-admin.php loaded at: " . filemtime(__FILE__));
 /**
  * Admin Login Endpoint
  * POST: /api/auth/login-admin.php
@@ -25,16 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     Auth::sendResponse(false, 'Invalid request method. POST required.');
 }
 
-error_log("=== LOGIN-ADMIN.PHP STARTED ===");
-
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
 // Validate required fields
 $username = $input['username'] ?? '';
 $password = $input['password'] ?? '';
-
-error_log("Username: " . $username . ", Password provided: " . (!empty($password) ? 'yes' : 'no'));
 
 if (empty($username) || empty($password)) {
     Auth::sendResponse(false, 'Username and password are required.');
@@ -44,16 +39,11 @@ try {
     $db = new Database();
     $conn = $db->connect();
 
-    // Debug: log the query
-    error_log("About to execute query for admin login");
-
     // Find admin by username
     $admin = $db->queryOne(
         "SELECT AdminId, Username, PasswordHash, RoleLevel FROM ADMIN WHERE Username = ?",
         [$username]
     );
-
-    error_log("Query executed successfully, admin: " . json_encode($admin));
 
     if (!$admin) {
         Auth::sendResponse(false, 'Invalid username or password.');
