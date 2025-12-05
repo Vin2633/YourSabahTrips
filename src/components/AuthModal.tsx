@@ -1,15 +1,24 @@
 import { X } from 'lucide-react';
 import { useState } from 'react';
+import {
+  registerTourist,
+  registerAdmin,
+  loginTourist,
+  loginAdmin,
+  type User,
+} from '../services/authService';
 
 interface AuthModalProps {
   onClose: () => void;
-  onLogin: (userData: any) => void;
+  onLogin: (userData: User) => void;
   darkMode: boolean;
 }
 
 export function AuthModal({ onClose, onLogin, darkMode }: AuthModalProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [userType, setUserType] = useState<'tourist' | 'admin'>('tourist');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -19,31 +28,51 @@ export function AuthModal({ onClose, onLogin, darkMode }: AuthModalProps) {
     phoneNo: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Mock authentication with role-based access
-    const userData = userType === 'admin' 
-      ? {
-          userId: 'admin_' + Math.random().toString(36).substr(2, 9),
-          username: formData.username,
-          firstName: formData.username,
-          lastName: '',
-          email: '',
-          phoneNo: '',
-          role: userType
+    setError('');
+    setLoading(true);
+
+    try {
+      let response;
+
+      if (userType === 'admin') {
+        // Admin authentication
+        if (isLogin) {
+          response = await loginAdmin(formData.username, formData.password);
+        } else {
+          response = await registerAdmin(
+            formData.username,
+            formData.email,
+            formData.password
+          );
         }
-      : {
-          userId: 'user_' + Math.random().toString(36).substr(2, 9),
-          firstName: formData.firstName || 'John',
-          lastName: formData.lastName || 'Doe',
-          username: '',
-          email: formData.email,
-          phoneNo: formData.phoneNo || '+60123456789',
-          role: userType
-        };
-    
-    onLogin(userData);
+      } else {
+        // Tourist authentication
+        if (isLogin) {
+          response = await loginTourist(formData.email, formData.password);
+        } else {
+          response = await registerTourist(
+            formData.firstName,
+            formData.lastName,
+            formData.email,
+            formData.password,
+            formData.phoneNo
+          );
+        }
+      }
+
+      if (response.success && response.data) {
+        onLogin(response.data);
+      } else {
+        setError(response.message || 'Authentication failed');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+      console.error('Auth error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,6 +92,13 @@ export function AuthModal({ onClose, onLogin, darkMode }: AuthModalProps) {
         <h2 className={`mb-6 text-center ${darkMode ? 'text-[oklch(0.9_0.03_160)]' : 'text-[#1b4332]'}`}>
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </h2>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
 
         {/* User Type Selection */}
         <div className="mb-6">
@@ -204,9 +240,14 @@ export function AuthModal({ onClose, onLogin, darkMode }: AuthModalProps) {
 
           <button
             type="submit"
-            className="w-full px-6 py-3 bg-[#52b788] text-white rounded-lg hover:bg-[#40916c] transition-colors shadow-lg"
+            disabled={loading}
+            className={`w-full px-6 py-3 rounded-lg transition-colors shadow-lg ${
+              loading
+                ? 'bg-gray-400 text-white cursor-not-allowed'
+                : 'bg-[#52b788] text-white hover:bg-[#40916c]'
+            }`}
           >
-            {isLogin ? 'Sign In' : 'Create Account'}
+            {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
           </button>
         </form>
 
