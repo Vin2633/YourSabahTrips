@@ -43,7 +43,6 @@ export function AuthModal({ onClose, onLogin, darkMode }: AuthModalProps) {
         } else {
           response = await registerAdmin(
             formData.username,
-            formData.email,
             formData.password
           );
         }

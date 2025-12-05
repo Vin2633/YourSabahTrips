@@ -1,6 +1,5 @@
 import { MapPin, Users, Filter, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import { PaymentModal } from './PaymentModal';
 import { getAllPackages, type Package, type Schedule } from '../services/packageService';
 

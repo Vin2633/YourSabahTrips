@@ -1,6 +1,7 @@
 import { BarChart3, TrendingUp, Users, Package, Edit2, Trash2, Plus, DollarSign, MapPin, Eye, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { registerAdmin } from '../services/authService';
 
 interface AdminDashboardProps {
   user: any;
@@ -68,7 +69,8 @@ export function AdminDashboard({ user, darkMode }: AdminDashboardProps) {
   const totalSales = salesData.reduce((sum, item) => sum + item.sales, 0);
   const totalBookings = salesData.reduce((sum, item) => sum + item.bookings, 0);
   const avgSatisfaction = 4.4;
-  const isSuperAdmin = user.username === 'SuperAdmin';
+  const isSuperAdmin = user.roleLevel === 'SuperAdmin';
+  console.log('User object:', user, 'RoleLevel:', user.RoleLevel, 'isSuperAdmin:', isSuperAdmin);
 
   const handleDeletePackage = (id: number) => {
     if (confirm('Are you sure you want to delete this package?')) {
@@ -86,15 +88,43 @@ export function AdminDashboard({ user, darkMode }: AdminDashboardProps) {
     setShowPackageModal(true);
   };
 
-  const handleRegisterAdmin = (e: React.FormEvent) => {
+  const handleRegisterAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs
+    if (!newAdminData.username.trim()) {
+      alert('Username is required.');
+      return;
+    }
+    
+    if (newAdminData.password.length < 8) {
+      alert('Password must be at least 8 characters long.');
+      return;
+    }
+    
     if (newAdminData.password !== newAdminData.confirmPassword) {
       alert('Passwords do not match!');
       return;
     }
-    alert(`Admin "${newAdminData.username}" registered successfully!`);
-    setShowAdminModal(false);
-    setNewAdminData({ username: '', password: '', confirmPassword: '' });
+
+    try {
+      const result = await registerAdmin(
+        newAdminData.username.trim(),
+        newAdminData.password,
+        'Standard',
+        user.roleLevel
+      );
+
+      if (result.success) {
+        alert(`Admin "${newAdminData.username}" registered successfully!`);
+        setShowAdminModal(false);
+        setNewAdminData({ username: '', password: '', confirmPassword: '' });
+      } else {
+        alert(`Registration failed: ${result.message}`);
+      }
+    } catch (error) {
+      alert(`Error registering admin: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   return (

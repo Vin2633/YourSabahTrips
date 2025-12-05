@@ -29,27 +29,33 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 // Validate required fields
 $username = $input['username'] ?? '';
-$email = $input['email'] ?? '';
 $password = $input['password'] ?? '';
-$roleLevel = $input['roleLevel'] ?? 'standard';
+$roleLevel = $input['roleLevel'] ?? 'Standard';
+$requestingAdminRoleLevel = $input['currentAdminRoleLevel'] ?? null;
 
-// Validation
-if (empty($username) || empty($email) || empty($password)) {
-    Auth::sendResponse(false, 'Username, email, and password are required.');
+// Verify the requesting admin is a SuperAdmin
+if (!$requestingAdminRoleLevel) {
+    Auth::sendResponse(false, 'Authorization info missing. Please be logged in.');
 }
 
-if (!Auth::isValidEmail($email)) {
-    Auth::sendResponse(false, 'Invalid email format.');
+// Must be exactly 'SuperAdmin' with capital S and A
+if ($requestingAdminRoleLevel !== 'SuperAdmin') {
+    Auth::sendResponse(false, 'Only SuperAdmins can register new admins. Access denied.');
+}
+
+// Validation
+if (empty($username) || empty($password)) {
+    Auth::sendResponse(false, 'Username and password are required.');
 }
 
 if (!Auth::isValidPassword($password)) {
-    Auth::sendResponse(false, 'Password must be at least 6 characters long.');
+    Auth::sendResponse(false, 'Password must be at least 8 characters long.');
 }
 
-// Validate role level
-$validRoles = ['standard', 'manager', 'superadmin'];
-if (!in_array(strtolower($roleLevel), $validRoles)) {
-    $roleLevel = 'standard';
+// Validate role level - must be properly capitalized
+$validRoles = ['Standard', 'SuperAdmin'];
+if (!in_array($roleLevel, $validRoles)) {
+    Auth::sendResponse(false, 'Invalid role level. Must be Standard or SuperAdmin.');
 }
 
 try {
@@ -66,23 +72,13 @@ try {
         Auth::sendResponse(false, 'Username already taken. Please choose a different username.');
     }
 
-    // Check if email already exists
-    $checkEmail = $db->queryOne(
-        "SELECT Email FROM ADMIN WHERE Email = ?",
-        [$email]
-    );
-
-    if ($checkEmail) {
-        Auth::sendResponse(false, 'Email already registered as admin.');
-    }
-
     // Hash password
     $passwordHash = Auth::hashPassword($password);
 
     // Insert new admin
     $db->execute(
-        "INSERT INTO ADMIN (Username, Email, PasswordHash, RoleLevel) VALUES (?, ?, ?, ?)",
-        [$username, $email, $passwordHash, $roleLevel]
+        "INSERT INTO ADMIN (Username, PasswordHash, RoleLevel) VALUES (?, ?, ?)",
+        [$username, $passwordHash, $roleLevel]
     );
 
     $adminId = $db->lastInsertId();
@@ -91,7 +87,6 @@ try {
     $userData = [
         'adminId' => $adminId,
         'username' => $username,
-        'email' => $email,
         'roleLevel' => $roleLevel,
         'role' => 'admin'
     ];
@@ -103,4 +98,3 @@ try {
 } catch (Exception $e) {
     Auth::sendResponse(false, 'Registration failed: ' . $e->getMessage());
 }
-?>

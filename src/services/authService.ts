@@ -55,7 +55,6 @@ export interface TouristUser {
 export interface AdminUser {
   adminId: number;
   username: string;
-  email: string;
   roleLevel: string;
   role: 'admin';
 }
@@ -103,18 +102,18 @@ export async function registerTourist(
  */
 export async function registerAdmin(
   username: string,
-  email: string,
   password: string,
-  roleLevel: string = 'standard'
+  roleLevel: string = 'standard',
+  currentAdminRoleLevel?: string
 ): Promise<AuthResponse> {
   try {
     const data = await fetchAPI('/auth/register-admin.php', {
       method: 'POST',
       body: JSON.stringify({
         username,
-        email,
         password,
         roleLevel,
+        currentAdminRoleLevel,
       }),
     });
     return data;
