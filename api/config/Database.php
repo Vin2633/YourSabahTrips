@@ -91,3 +91,7 @@ class Database
         return $this->conn->lastInsertId();
     }
 }
+<<<<<<< HEAD
+=======
+?>
+>>>>>>> 21940edd030c5379940fd68bdabd4ba6015bc7eb
