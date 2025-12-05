@@ -8,7 +8,6 @@ class Auth
 {
     /**
      * Hash a password using PHP's password_hash (bcrypt)
-     * More secure than SHA256
      */
     public static function hashPassword($password)
     {
@@ -37,7 +36,7 @@ class Auth
      */
     public static function isValidPassword($password)
     {
-        return strlen($password) >= 6;
+        return strlen($password) >= 8;
     }
 
     /**

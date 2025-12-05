@@ -31,6 +31,17 @@ $input = json_decode(file_get_contents('php://input'), true);
 $username = $input['username'] ?? '';
 $password = $input['password'] ?? '';
 $roleLevel = $input['roleLevel'] ?? 'Standard';
+$requestingAdminRoleLevel = $input['currentAdminRoleLevel'] ?? null;
+
+// Verify the requesting admin is a SuperAdmin
+if (!$requestingAdminRoleLevel) {
+    Auth::sendResponse(false, 'Authorization info missing. Please be logged in.');
+}
+
+// Must be exactly 'SuperAdmin' with capital S and A
+if ($requestingAdminRoleLevel !== 'SuperAdmin') {
+    Auth::sendResponse(false, 'Only SuperAdmins can register new admins. Access denied.');
+}
 
 // Validation
 if (empty($username) || empty($password)) {
@@ -38,13 +49,13 @@ if (empty($username) || empty($password)) {
 }
 
 if (!Auth::isValidPassword($password)) {
-    Auth::sendResponse(false, 'Password must be at least 6 characters long.');
+    Auth::sendResponse(false, 'Password must be at least 8 characters long.');
 }
 
-// Validate role level
-$validRoles = ['standard', 'manager', 'superadmin'];
-if (!in_array(strtolower($roleLevel), $validRoles)) {
-    $roleLevel = 'standard';
+// Validate role level - must be properly capitalized
+$validRoles = ['Standard', 'SuperAdmin'];
+if (!in_array($roleLevel, $validRoles)) {
+    Auth::sendResponse(false, 'Invalid role level. Must be Standard or SuperAdmin.');
 }
 
 try {
@@ -87,4 +98,3 @@ try {
 } catch (Exception $e) {
     Auth::sendResponse(false, 'Registration failed: ' . $e->getMessage());
 }
-?>

@@ -90,6 +90,18 @@ export function AdminDashboard({ user, darkMode }: AdminDashboardProps) {
 
   const handleRegisterAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs
+    if (!newAdminData.username.trim()) {
+      alert('Username is required.');
+      return;
+    }
+    
+    if (newAdminData.password.length < 8) {
+      alert('Password must be at least 8 characters long.');
+      return;
+    }
+    
     if (newAdminData.password !== newAdminData.confirmPassword) {
       alert('Passwords do not match!');
       return;
@@ -97,9 +109,10 @@ export function AdminDashboard({ user, darkMode }: AdminDashboardProps) {
 
     try {
       const result = await registerAdmin(
-        newAdminData.username,
+        newAdminData.username.trim(),
         newAdminData.password,
-        'standard'
+        'Standard',
+        user.roleLevel
       );
 
       if (result.success) {

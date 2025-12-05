@@ -103,7 +103,8 @@ export async function registerTourist(
 export async function registerAdmin(
   username: string,
   password: string,
-  roleLevel: string = 'standard'
+  roleLevel: string = 'standard',
+  currentAdminRoleLevel?: string
 ): Promise<AuthResponse> {
   try {
     const data = await fetchAPI('/auth/register-admin.php', {
@@ -112,6 +113,7 @@ export async function registerAdmin(
         username,
         password,
         roleLevel,
+        currentAdminRoleLevel,
       }),
     });
     return data;

@@ -64,6 +64,12 @@ try {
         Auth::sendResponse(false, 'Invalid username or password.');
     }
 
+    // Validate role level - only Standard or SuperAdmin allowed
+    $validRoles = ['Standard', 'SuperAdmin'];
+    if (!in_array($admin['RoleLevel'], $validRoles)) {
+        Auth::sendResponse(false, 'Your account has an invalid role. Please contact administrator.');
+    }
+
     // Create user session
     $userData = [
         'adminId' => (int) $admin['AdminId'],
